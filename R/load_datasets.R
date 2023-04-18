@@ -4,8 +4,7 @@ load_datasets <- function(name) {
     if(!require(tidyverse))
         install.packages("tidyverse")
     library(tidyverse)
-    name <- "/" + name
 
     forder <- dirname(rstudioapi::getSourceEditorContext()$path)
-    sensors <- read.csv(paste0(folder,""))
+    return (sensors <- read.csv(paste0(folder,name)))
 }
