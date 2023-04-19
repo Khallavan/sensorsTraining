@@ -14,5 +14,6 @@
 #   Test Package:              'Ctrl + Shift + T'
 
 final_models <- function() {
-  print("Hello, world!")
+    # @TODO: obtain the final models to predict distance and shape's wall
+    print("Hello, world!")
 }
