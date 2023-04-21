@@ -1,44 +1,291 @@
 ---
 title: "“kNN, Linear regression, and multilinear regression”"
-author: 
-- "Chavez Miguel Angel 80811"
-- "Ducuara Quesada Daniela 85742"
-- "Garcia Castillo Fernando 61865" 
-- "Mora Andres Acevedo 55305"
-- "Morales Javier Sebastian 73322"
-- "Palacios Diego Alejandro 46026"
+author:
+- Chavez Miguel Angel 80811
+- Ducuara Quesada Daniela 85742
+- Garcia Castillo Fernando 61865
+- Mora Andres Acevedo 55305
+- Morales Javier Sebastian 73322
+- Palacios Diego Alejandro 46026
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  word_document: default
+  pdf_document: default
 ---
+
+-**Enlace de GitHub:** https://github.com/Khallavan/sensorsTraining
 
 ## Machine Learning
 
 Machine Learning es una forma de la inteligencia artificial que permite crear modelos estadisticos y algoritmos, en donde la máquina aprende de los datos, mas no mediante la programación predeterminada. Estos modelos pueden procesar grandes cantidades de datos y por medio del entrenamiento identificar patrones de los datos, lo que permite crear modelos mas precisos en la predicción de la información de salida.
 
-## Resumen:
+## ¿Que es KNN?
+
+KNN,en ingles K Nearest Neighbor, es un algoritmo que utiliza la "similitud de caracteristicas" para predecir los valores de los nuevos puntos de datos, lo que significa que al nuevo punto de datos se le asignara un valor en función de que tan cerca conicide los puntos en el conjunto de entrenamiento. algunas de las caracteristicas que tiene el KNN son:
+
+-   utiliza conjuntos de datos de entrada etiquetados para asi poder predecir la salida de los datos. -Es un algoritmo de aprendizaje simple y puede ser implementado facilmente para un conjunto variado de problemas.
+-   Se basa principalmemte en la similitud de caracteristicas,es decir, verifica cuán similares es un punto de datos con relacion a su vecino y clasifica el punto de datos en la cl...
+
+## Regresion lineal y multilineal
+
+Un analisis de regresión lineal se utiliza para predecir el valor de una variable según el valor de la otra, por lo que estima los coeficientes de la ecuacion lineal,la regresion lineal se ajusta a una linea recta lo que minimiza discrepancias entre los valores de salida previsto y los reales. El modelo de regresion lineal se considera relativamente sensillo ya que propporciona una formula matematica facil de interpretar que puede generar predicciones.
+
+El modelo de regresión multilineal,es un modelo estadistico que permite generar un modelo lineal en el que el valor de la variable dependiente, se determina a partir de un conjunto de variables independientes llamadas "predictores". \## Resumen:
 
 En el presente informe se realiza una adquisión de datos de dos sensores diferentes que se adaptan a un carrito robot, esto con el fin de tomar los datos que arroja cada sensor a diferentes distancias sobre una superficie (pared) plana, concava y convexa. Los dos sensores utilizados fueron los siguientes: Ultrasonido HCR-04 Y Laser VL53L0X. Se realiza los siguientes pasos para poder tomar los datos:
 
-1.  **Adquisición de datos:** Desarrollar un sistema de adquisición (hardware y software) para capturar datos de distancia.
+##1.  Adquisición de datos
+Desarrollar un sistema de adquisición (hardware y software) para capturar datos de distancia.
 
-
--Se acondicionaron dos sensores, un ultrasonido y uno láser. El ultrasonido entrega el valor  que tarda la onda en emitir y recibirla.
-Para el láser se tomaron mediciones directas en longitud, esto para poder generar los modelos de entrenamiento y predicción sin usar librerías que suministren la curva o ecuación  característica del comportamiento de los sensores, ya que se verían  afectados los valores con los modelos definidos.
+-Se acondicionaron dos sensores, un ultrasonido y uno láser. El ultrasonido entrega el valor que tarda la onda en emitir y recibirla. Para el láser se tomaron mediciones directas en longitud, esto para poder generar los modelos de entrenamiento y predicción sin usar librerías que suministren la curva o ecuación característica del comportamiento de los sensores, ya que se verían afectados los valores con los modelos definidos.
 
 -   La primera distancia se toma desde 10 cm desde la pared, y se fue aumentando la distancia cada 10 cm, para llegar a un máximo de 50 cm de distancia. En cada distancia se tomaron 40 observaciones.
 
 2.  Se tomaron los datos y se registran en un archivo .csv. A continuación se carga el archivo para poder ver los datos para cada sensor y con cada superficie.
 
 ```{r, echo=TRUE }
+load_datasets <- function(name_dataset) {
+    if(!require(tidyverse))
+        install.packages("tidyverse")
+    library(tidyverse)
+
+    folder <- dirname(rstudioapi::getSourceEditorContext()$path)
+    parentFolder <- dirname(folder)
+    sensors <- read.csv2(paste0(parentFolder,"/datasets/",name_dataset))
+    return (sensors)
+}
+```
+
+Esta función load_datasets se encarga de leer los datasets que estan cargados en el repositorio. Lee los archivos .csv que estan separados por punto y coma y por ello se emplea la función (read.csv2)
+
+1.1 **Carga de datasets**
+
+```{r, echo=TRUE }
+if(!require(tidyverse))
+  install.packages("tidyverse")
 library(tidyverse)
+sensors.df <- load_datasets("sensors_dataset_A.csv")
+ultrasonic.data <- sensors.df %>% select(ultrasonic, distance)
+laser.data <- sensors.df %>% select(laser, distance)
+multi.data <- sensors.df %>% select(ultrasonic, laser, distance)
+```
 
-folder<- dirname(rstudioapi::getSourceEditorContext()$path)
-parentFolder<- dirname(folder)
+Aquí se carga el dataset con el nombre de sensors.df. A continuación, se muestra una pequeña parte de los datos:
 
-sensors_dataset<-read.csv(paste0("sensors_shapes_dataset.csv")
-                    , stringsAsFactors = TRUE)
-View(sensors_dataset)
+```{r, echo=TRUE, include=TRUE}
+head(multi.data)
 
 ```
+
+1.2 **visualización de los datos en gráfica de dispersión**
+
+```{r, echo=TRUE }
+if(!require(ggplot2))
+  install.packages("ggplot2")
+library(ggplot2)
+ultrasonic.data %>% 
+    ggplot(aes(x = ultrasonic, y = distance)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+```
+
+```         
+                      Gráfica de los datos del sensor ultrasonico. 
+```
+
+```{r, echo=TRUE }
+if(!require(ggplot2))
+  install.packages("ggplot2")
+library(ggplot2)
+laser.data %>% 
+    ggplot(aes(x = laser, y = distance)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+```
+
+```         
+                    Gráfica de los datos del sensor Laser.
+                    
+```
+
+La siguiente gráfica se mostraran la dispersión de los datos de los dos sensores.
+
+```{r, echo=TRUE }
+if(!require(ggplot2))
+  install.packages("ggplot2")
+library(ggplot2)
+multi.data %>% 
+    ggplot(aes(y = distance)) +
+    geom_line(aes(x = ultrasonic, color = "Ultrasonic")) +
+    geom_line(aes(x = laser, color = "Laser")) +
+    geom_smooth(aes(x = ultrasonic, color = "Ultrasonic"), method = "lm", se = FALSE) +
+    geom_smooth(aes(x = laser, color = "Laser"), method = "lm", se = FALSE) +
+    scale_color_manual(name = "Sensor", values = c("Ultrasonic" = "blue", "Laser" = "red")) +
+    labs(y = "Distance", x = "Sensor Reading")
+
+```
+
+1.2 **Preparación de datos para cada modelo¨**
+
+Se usa la libreria caret para realizar el entrenamiento de los modelos predictivos mediante la automatización de tareas comunes, como la normalización de datos, la creación de modelos, la validación cruzada y la evaluación de modelos.
+
+Para una mejor claridad de los datos se emplea y para su posterior replicación en caso de que se requiera, se utiliza una semilla predeterminada.
+
+```{r, echo=TRUE }
+if(!require(caret))
+  install.packages("caret")
+library(caret)
+set.seed(1)
+ultrasonic.train.samples <- ultrasonic.data$distance %>%
+    createDataPartition(p = 0.8, list = FALSE)
+laser.train.samples <- laser.data$distance %>%
+    createDataPartition(p = 0.8, list = FALSE)
+multi.train.samples <- multi.data$distance %>%
+    createDataPartition(p = 0.8, list = FALSE)
+
+
+ultrasonic.train.data <- ultrasonic.data[ultrasonic.train.samples,
+                                        c("ultrasonic", "distance")]
+ultrasonic.test.data <- ultrasonic.data[-ultrasonic.train.samples,
+                                       c("ultrasonic", "distance")]
+
+laser.train.data <- laser.data[laser.train.samples, c("laser", "distance")]
+laser.test.data <- laser.data[-laser.train.samples, c("laser", "distance")]
+multi.train.data <- multi.data[multi.train.samples, c("ultrasonic", "laser", "distance")]
+multi.test.data <- multi.data[-multi.train.samples, c("ultrasonic", "laser", "distance")]
+```
+
+Implementando la función de caret, entrenamos un modelo de regresión lineal para cada sensor y un modelo multilineal empleando ambos sensores. La ventaja que nos porporciona la libreria Caret es que simplifica los valores de predicción R\^2, MAE y RMSE.
+
+1.3 **Entrenamiento de los modelos**
+
+```{r, echo=TRUE }
+model.distance.ultrasonic <- train(
+        distance ~ ultrasonic,
+        data = ultrasonic.train.data,
+        method = "lm",
+        trControl = trainControl("cv", number = 10)
+        )
+model.distance.laser <- train(
+        distance ~ laser,
+        data = laser.train.data,
+        method = "lm",
+        trControl = trainControl("cv", number = 10)
+    )
+model.multi.distance <- train(
+        distance ~ ultrasonic + laser,
+        data = multi.train.data,
+        method= "lm",
+        trControl = trainControl("cv", number = 10)
+    )
+
+```
+
+-En esta parte usamos la otra parte del 20% de los datos separados.
+
+```{r, echo=TRUE }
+predict.ultrasonic <- model.distance.ultrasonic %>%  predict(ultrasonic.test.data)
+predict.laser <- model.distance.laser %>% predict(laser.test.data)
+predict.multi <- model.multi.distance %>% predict(multi.test.data)
+```
+
+```{r, echo=TRUE }
+postResample(predict.ultrasonic, ultrasonic.test.data$distance)
+postResample(predict.laser, laser.test.data$distance)
+postResample(predict.multi, multi.test.data$distance)
+
+```
+
+-Prueba de los modelos en base a un dataset con los datos de los sensores capturados de forma aleatoria.
+
+```{r, echo=TRUE }
+new_df_test <- load_datasets("random_dataset_sensors_A.csv")
+df_test_cleared <- new_df_test %>% select(ultrasonic, laser)
+df_test_ultrasonic <- df_test_cleared %>% select(ultrasonic)
+df_test_laser <- df_test_cleared %>% select(laser)
+
+predict(model.multi.distance, df_test_cleared)
+predict(model.distance.ultrasonic, df_test_ultrasonic)
+predict(model.distance.laser, df_test_laser)
+```
+-Estas líneas de código lo que realizan es que guardan los modelos lineales entrenados en formato RDS, en la carpeta "models" del paquete.
+
+```{r, echo=TRUE, include=TRUE, eval=FALSE}
+
+folder <- dirname(rstudioapi::getSourceEditorContext()$path)
+parentFolder <- dirname(folder)
+saveRDS(model.distance.laser, paste0(parentFolder,"/models/model_laser_distance.rds"))
+saveRDS(model.distance.ultrasonic, paste0(parentFolder,"/models/model_ultrasonic.rds"))
+saveRDS(model.multi.distance, paste0(parentFolder,"/models/model_laser_ultrasonic_distance.rds"))
+```
+## 2. Predicción de una variable categorica
+
+En esta sección vamos a realizar la predicción de los datos obtenidos por cada sensor para categorizar las diferentes superficies, plana, concava o convexa.
+
+```{r, echo=TRUE}
+if(!require(tidyverse))
+  install.packages("tidyverse")
+library(tidyverse)
+if(!require(caret))
+  install.packages("caret")
+library(caret)
+
+shape_df <- load_datasets("sensors_shapes_dataset.csv")
+shape_df$Shape <- as.factor(shape_df$Shape)
+head(shape_df)
+```
+```{r, echo=TRUE}
+set.seed(1)
+data.train.idx <- createDataPartition(shape_df$Shape, p = 0.7, list = FALSE)
+train.data = shape_df[data.train.idx,]
+test.data = shape_df[-data.train.idx,]
+```
+
+
+-Entrenamiento de los datos con hold out cross-validation (70-30).
+```{r, echo=TRUE}
+ctrl <- trainControl(method="LGOCV", p = 0.3)
+    shape.model.classificator <- train(
+        Shape ~ ultrasonic + laser,
+        data = train.data,
+        method = "knn",
+        tuneGrid = data.frame(k = 3),
+        trControl = ctrl,
+    )
+```
+
+
+-predición de los datos 
+```{r, echo=TRUE}
+predictions <- predict(shape.model.classificator, test.data)
+confusionMatrix(predictions, test.data$Shape)
+confusionMatrix(predictions, test.data$Shape)$overall["Accuracy"]
+```
+
+-Prueba con los datos aleatorios
+```{r, echo=TRUE}
+random_df <- load_datasets("random_shape_dataset.csv")
+random_df <- random_df %>% select("ultrasonic", "laser")
+predict(shape.model.classificator, random_df)
+```
+
+-Almacenar el modelo 
+```{r, echo=TRUE, include=TRUE}
+folder <- dirname(rstudioapi::getSourceEditorContext()$path)
+parentFolder <- dirname(folder)
+saveRDS(shape.model.classificator, paste0(parentFolder,"/models/shape_model_classificator.rds"))
+```
+
+
+##Conclusiones de los modelos 
+-Con la libreria Caret se pudo realizar el entrenamiento de los datos de una forma mas eficiente y con una interfaz fácil si se comprenden las bases de su funcionamiento. Esto también nos ahorra tiempo ya que se automatiza el proceso de construcción de modelos de regresión lineal y modelos de predicción de Knn. 
+
+-Se garantiza que los datos tengan una mejor limpieza, lo que minimiza el ruido al momento de la captura de los datos.
+
+-Ayuda al preprocesamiento de datos de clasificación categorica, si estos datos seran empleados al momento de clasificar la forma de las superficies. 
+
+-Cuando se realizaron la toma de datos y se procesaron, y por ultimo se realiza el modelo de predicción la distancia no es un dato predictor para poder clasificar la forma de la superficie. 
+
+-El modelo Knn es un modelo que se utiliza para calsificar objetos de diferentes categorías, por lo que se basa en la similitud entre los datos y los objetos del entrenamiento..
 
 
