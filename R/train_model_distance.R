@@ -6,6 +6,7 @@
 #' Takes a 80 % from data in training processes and a 20 % for testing
 #'
 
+#library(sensorsTraining)
 train_model_distance <- function(){
     # @TODO: Train model function to predict distance of sensors.
     if(!require(tidyverse))

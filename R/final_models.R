@@ -1,18 +1,10 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Install Package:           'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
+#' @name final_models
+#' @title final models
+#' takes the models functions and train them with differents
+#' seeds each time that calls the training functions. And saves
+#' the models in rds files.
 
+#library(sensorsTraining)
 final_models <- function() {
     folder <- dirname(rstudioapi::getSourceEditorContext()$path)
     parentFolder <- dirname(folder)
@@ -35,4 +27,12 @@ final_models <- function() {
     saveRDS(model.distance.laser, paste0(parentFolder,"/models/model_laser_distance.rds"))
     saveRDS(model.distance.ultrasonic, paste0(parentFolder,"/models/model_ultrasonic.rds"))
     saveRDS(model.multi.distance, paste0(parentFolder,"/models/model_laser_ultrasonic_distance.rds"))
+
+    # Train the shape clasifictor with a random seed each time
+    train_model_classificator()
+
+    random_df <- load_datasets("random_shape_dataset.csv")
+    random_df <- random_df %>% select("ultrasonic", "laser")
+    predict(shape.model.classificator, random_df)
+    saveRDS(shape.model.classificator, paste0(parentFolder,"/models/shape_model_classificator.rds"))
 }
