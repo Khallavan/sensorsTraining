@@ -1,30 +1,44 @@
 ---
-title: "Entrenamiento de Sensores de Distancia"
-author: "Sebastian Morales"
-date: "2023-04-19"
+title: "“kNN, Linear regression, and multilinear regression”"
+author: 
+- "Chavez Miguel Angel 80811"
+- "Ducuara Quesada Daniela 85742"
+- "Garcia Castillo Fernando 61865" 
+- "Mora Andres Acevedo 55305"
+- "Morales Javier Sebastian 73322"
+- "Palacios Diego Alejandro 46026"
+date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+## Machine Learning
+
+Machine Learning es una forma de la inteligencia artificial que permite crear modelos estadisticos y algoritmos, en donde la máquina aprende de los datos, mas no mediante la programación predeterminada. Estos modelos pueden procesar grandes cantidades de datos y por medio del entrenamiento identificar patrones de los datos, lo que permite crear modelos mas precisos en la predicción de la información de salida.
+
+## Resumen:
+
+En el presente informe se realiza una adquisión de datos de dos sensores diferentes que se adaptan a un carrito robot, esto con el fin de tomar los datos que arroja cada sensor a diferentes distancias sobre una superficie (pared) plana, concava y convexa. Los dos sensores utilizados fueron los siguientes: Ultrasonido HCR-04 Y Laser VL53L0X. Se realiza los siguientes pasos para poder tomar los datos:
+
+1.  **Adquisición de datos:** Desarrollar un sistema de adquisición (hardware y software) para capturar datos de distancia.
+
+
+-Se acondicionaron dos sensores, un ultrasonido y uno láser. El ultrasonido entrega el valor  que tarda la onda en emitir y recibirla.
+Para el láser se tomaron mediciones directas en longitud, esto para poder generar los modelos de entrenamiento y predicción sin usar librerías que suministren la curva o ecuación  característica del comportamiento de los sensores, ya que se verían  afectados los valores con los modelos definidos.
+
+-   La primera distancia se toma desde 10 cm desde la pared, y se fue aumentando la distancia cada 10 cm, para llegar a un máximo de 50 cm de distancia. En cada distancia se tomaron 40 observaciones.
+
+2.  Se tomaron los datos y se registran en un archivo .csv. A continuación se carga el archivo para poder ver los datos para cada sensor y con cada superficie.
+
+```{r, echo=TRUE }
+library(tidyverse)
+
+folder<- dirname(rstudioapi::getSourceEditorContext()$path)
+parentFolder<- dirname(folder)
+
+sensors_dataset<-read.csv(paste0("sensors_shapes_dataset.csv")
+                    , stringsAsFactors = TRUE)
+View(sensors_dataset)
+
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
