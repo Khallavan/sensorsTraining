@@ -1,4 +1,4 @@
-﻿count;ultrasonic (s);laser (num);distance (cm);Shape
+﻿count;ultrasonic;laser;distance;Shape
 1;804;142;10;convex
 2;804;145;10;convex
 3;804;145;10;convex

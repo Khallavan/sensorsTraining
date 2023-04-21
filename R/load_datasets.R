@@ -4,7 +4,7 @@
 #' charges a data set saved in the ./datasets folder
 #' @return sensors dataset as dataFrame with string as factor
 #' @example
-#' load_datasts(/your_dataset.csv)
+#' load_datsets("your_dataset.csv")
 #'
 
 load_datasets <- function(name_dataset) {
@@ -14,6 +14,6 @@ load_datasets <- function(name_dataset) {
 
     folder <- dirname(rstudioapi::getSourceEditorContext()$path)
     parentFolder <- dirname(folder)
-    return (sensors <- read.csv(paste0(parentFolder,"/datasets",name_dataset),
-                                stringsAsFactors =  TRUE))
+    sensors <- read.csv2(paste0(parentFolder,"/datasets/",name_dataset))
+    return (sensors)
 }
